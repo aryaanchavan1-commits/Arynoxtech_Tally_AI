@@ -247,7 +247,8 @@ Full API documentation available at `http://localhost:8000/docs` (Swagger UI) wh
 This project is open source under the MIT License.
 
 ---
-
+## Developer
+ Aryan Chavan
 ## Disclaimer
 
 This software is provided as-is. The AI agent's actions are proposals that require user confirmation before execution. The authors are not responsible for any financial data loss or incorrect accounting entries. Always verify AI-generated actions before confirming. For GST compliance, consult a qualified chartered accountant.
