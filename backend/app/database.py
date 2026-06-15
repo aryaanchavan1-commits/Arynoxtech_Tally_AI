@@ -1,5 +1,5 @@
 import os
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 DB_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
@@ -11,6 +11,14 @@ engine = create_engine(
     connect_args={"check_same_thread": False},
     echo=False,
 )
+
+with engine.connect() as conn:
+    conn.execute(text("PRAGMA journal_mode=WAL"))
+    conn.execute(text("PRAGMA synchronous=NORMAL"))
+    conn.execute(text("PRAGMA busy_timeout=5000"))
+    conn.execute(text("PRAGMA cache_size=-64000"))
+    conn.execute(text("PRAGMA foreign_keys=ON"))
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 

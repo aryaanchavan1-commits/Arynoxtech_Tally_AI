@@ -4,7 +4,7 @@ from typing import Optional
 
 class AISettingsCreate(BaseModel):
     provider: str
-    api_key: str
+    api_key: Optional[str] = None
     model: Optional[str] = None
 
 

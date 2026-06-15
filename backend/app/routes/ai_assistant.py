@@ -95,7 +95,8 @@ def save_ai_settings(data: AISettingsCreate, db: Session = Depends(get_db), user
     existing = db.query(AISetting).filter(AISetting.user_id == user_id).first()
     if existing:
         existing.provider = data.provider
-        existing.api_key_encrypted = encrypt_data(data.api_key)
+        if data.api_key:
+            existing.api_key_encrypted = encrypt_data(data.api_key)
         existing.model = data.model
         existing.is_active = True
         db.commit()
@@ -103,9 +104,11 @@ def save_ai_settings(data: AISettingsCreate, db: Session = Depends(get_db), user
         return AISettingsResponse(
             id=existing.id, provider=existing.provider,
             model=existing.model, is_active=existing.is_active,
-            has_api_key=True,
+            has_api_key=bool(existing.api_key_encrypted),
         )
     else:
+        if not data.api_key:
+            raise HTTPException(status_code=400, detail="API key required for new settings")
         setting = AISetting(
             provider=data.provider,
             api_key_encrypted=encrypt_data(data.api_key),
@@ -119,7 +122,7 @@ def save_ai_settings(data: AISettingsCreate, db: Session = Depends(get_db), user
         return AISettingsResponse(
             id=setting.id, provider=setting.provider,
             model=setting.model, is_active=setting.is_active,
-            has_api_key=True,
+            has_api_key=bool(setting.api_key_encrypted),
         )
 
 
@@ -153,7 +156,7 @@ async def test_ai_connection(data: AITestRequest):
         headers["X-Title"] = "Arynoxtech Tally"
 
     try:
-        async with httpx.AsyncClient(timeout=20) as client:
+        async with httpx.AsyncClient(timeout=10) as client:
             response = await client.post(
                 f"{provider_config['base_url']}/chat/completions",
                 headers=headers,
@@ -168,6 +171,8 @@ async def test_ai_connection(data: AITestRequest):
                 except Exception:
                     err_msg = response.text[:200]
                 return AITestResponse(success=False, message=f"Error ({response.status_code}): {err_msg}")
+    except httpx.TimeoutException:
+        return AITestResponse(success=False, message="Connection timed out after 10s. Provider may be slow.")
     except Exception as e:
         return AITestResponse(success=False, message=f"Connection failed: {str(e)}")
 

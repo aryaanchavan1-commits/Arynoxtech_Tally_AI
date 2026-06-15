@@ -14,7 +14,9 @@ services:
       - APP_NAME=Arynoxtech Tally
       - OWNER=Aryan Chavan
       - COMPANY=Arynoxtech
-      - SECRET_KEY=change-this-in-production
+      - SECRET_KEY=arynoxtech-tally-secret-key-change-in-production
+      - ENCRYPTION_KEY=arynoxtech-encryption-key-32chars!!
+      - UVICORN_RELOAD=false
     restart: unless-stopped
 
   flutter-app:

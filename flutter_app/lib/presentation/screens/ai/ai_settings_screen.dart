@@ -16,10 +16,16 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
   String? _model;
   List<dynamic> _models = [];
   bool _testing = false;
+  bool _keyChanged = false;
 
   @override
   void initState() {
     super.initState();
+    _keyCtrl.addListener(() {
+      if (!_keyChanged && _keyCtrl.text.isNotEmpty) {
+        setState(() => _keyChanged = true);
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final ai = context.read<AIProvider>();
       ai.loadProviders();
@@ -34,15 +40,18 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
   }
 
   Future<void> _save() async {
-    if (_keyCtrl.text.isEmpty) return;
     final ai = context.read<AIProvider>();
-    final success = await ai.saveSettings({
+    final body = <String, dynamic>{
       'provider': _provider,
-      'api_key': _keyCtrl.text,
       'model': _model,
-    });
+    };
+    if (_keyChanged && _keyCtrl.text.isNotEmpty) {
+      body['api_key'] = _keyCtrl.text;
+    }
+    final success = await ai.saveSettings(body);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(success ? 'Settings saved' : 'Failed to save')));
+      if (success) setState(() => _keyChanged = false);
     }
   }
 
@@ -74,10 +83,6 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final ai = context.watch<AIProvider>();
-
-    if (ai.settings != null && _keyCtrl.text.isEmpty) {
-      _keyCtrl.text = '********';
-    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('AI Settings')),
@@ -118,9 +123,19 @@ class _AISettingsScreenState extends State<AISettingsScreen> {
               decoration: const InputDecoration(labelText: 'Model'),
             ),
           const SizedBox(height: 16),
+          if (ai.settings?['has_api_key'] == true && !_keyChanged)
+            Row(children: [
+              Icon(Icons.check_circle, size: 16, color: AppTheme.successColor),
+              const SizedBox(width: 6),
+              Text('API key is saved', style: TextStyle(color: AppTheme.successColor, fontSize: 13)),
+            ]),
+          const SizedBox(height: 4),
           TextFormField(
             controller: _keyCtrl,
-            decoration: const InputDecoration(labelText: 'API Key'),
+            decoration: InputDecoration(
+              labelText: 'API Key',
+              hintText: ai.settings?['has_api_key'] == true ? 'Leave empty to keep existing key' : 'Enter your API key',
+            ),
             obscureText: true,
           ),
           const SizedBox(height: 24),
