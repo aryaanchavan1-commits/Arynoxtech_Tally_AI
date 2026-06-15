@@ -1,0 +1,55 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.env
+
+# PyInstaller
+*.spec
+backend/build/
+backend/dist/
+backend/audio_responses/
+backend/uploaded_files/
+
+# Database
+backend/data/*.db
+backend/data/*.sqlite
+
+# Flutter / Dart
+flutter_app/.dart_tool/
+flutter_app/.packages
+flutter_app/.flutter-plugins
+flutter_app/.flutter-plugins-dependencies
+flutter_app/build/
+flutter_app/ios/Pods/
+flutter_app/ios/.symlinks/
+flutter_app/android/.gradle/
+flutter_app/android/build/
+flutter_app/android/local.properties
+flutter_app/android/key.properties
+flutter_app/macos/Pods/
+flutter_app/macos/.symlinks/
+flutter_app/windows/flutter/ephemeral/
+flutter_app/windows/runner/Release/
+flutter_app/linux/flutter/ephemeral/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Client distribution (pre-built binaries)
+client_dist/
+
+# Test outputs
+backend/.pytest_cache/
+backend/tests/__pycache__/

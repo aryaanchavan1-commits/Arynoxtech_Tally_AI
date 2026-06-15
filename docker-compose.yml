@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    container_name: arynoxtech-tally-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/data
+      - ./backend/backups:/app/backups
+      - ./backend/invoices:/app/invoices
+    environment:
+      - APP_NAME=Arynoxtech Tally
+      - OWNER=Aryan Chavan
+      - COMPANY=Arynoxtech
+      - SECRET_KEY=change-this-in-production
+    restart: unless-stopped
+
+  flutter-app:
+    build: ./flutter_app
+    container_name: arynoxtech-tally-ui
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

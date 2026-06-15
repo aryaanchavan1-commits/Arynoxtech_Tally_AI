@@ -1,0 +1,4 @@
+-keep class com.arynoxtech.tally.** { *; }
+-keep class * extends FlutterFragmentActivity
+-keep class com.google.gson.** { *; }
+-keep class org.json.** { *; }
